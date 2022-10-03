@@ -13,18 +13,26 @@ contract HealthWalletAccess is ERC721URIStorage, Ownable {
   mapping(uint256 => address[]) tokenGuardians;
 
   event AccessTokenCreated(address patient, uint256 tokenId);
+  event GuardianAssigned(address indexed guardian, uint256 tokenId);
 
   constructor() ERC721("HealthWalletAccess", "HWA") {}
+
+  function _assignGuardian(address _guardian, uint256 _tokenId) internal {
+    require(!isGuardian(_guardian, _tokenId), "HWA: Already assigned as guardian for this token.");
+    tokenGuardians[_tokenId].push(_guardian);
+    emit GuardianAssigned(_guardian, _tokenId);
+  }
 
   function requestNewAccessToken(
     address _patient,
     bool _assignAdminAsGuardian
   ) public returns (uint256) {
+    require(balanceOf(_patient) == 0, "HWA: One token per patient allowed");
     uint256 newTokenId = _tokenIds.current();
     _mint(_patient, newTokenId);
 
     if (_assignAdminAsGuardian == true) {
-      tokenGuardians[newTokenId].push(owner());
+      _assignGuardian(owner(), newTokenId);
     }
 
     _tokenIds.increment();

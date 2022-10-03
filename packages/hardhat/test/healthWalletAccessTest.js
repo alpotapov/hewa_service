@@ -19,12 +19,28 @@ describe("HealthWallet Backup", function () {
     });
 
     describe("requestNewAccessToken()", function () {
+      beforeEach(async () => {
+        const HealthWalletAccess = await ethers.getContractFactory(
+          "HealthWalletAccess"
+        );
+
+        hwaContract = await HealthWalletAccess.deploy();
+      });
       it("should issue new HealthWalletAccess NFT to patient", async () => {
         const [, patient] = await ethers.getSigners();
 
         expect(await hwaContract.requestNewAccessToken(patient.address, false))
           .to.emit(hwaContract, "Transfer")
           .withArgs(0, patient.address);
+      });
+
+      it("should not allow more than one token per patient", async () => {
+        const [, patient] = await ethers.getSigners();
+
+        await hwaContract.requestNewAccessToken(patient.address, true);
+
+        await expect(hwaContract.requestNewAccessToken(patient.address, false))
+          .to.be.reverted;
       });
 
       it("should assign admin as guardian", async () => {
