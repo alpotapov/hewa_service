@@ -319,7 +319,8 @@ module.exports = {
     },
   },
   abiExporter: {
-    path: "../react-app/src/contracts/ABI",
+    // can specify multiple dirs to export to https://www.npmjs.com/package/hardhat-abi-exporter
+    path: "../backend/src/contracts",
     runOnCompile: true,
     clear: true,
     flat: true,

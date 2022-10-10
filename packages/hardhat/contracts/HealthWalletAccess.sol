@@ -5,8 +5,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./VerifySignature.sol";
 
-contract HealthWalletAccess is ERC721URIStorage, Ownable {
+contract HealthWalletAccess is ERC721URIStorage, Ownable, VerifySignature {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
@@ -25,8 +26,14 @@ contract HealthWalletAccess is ERC721URIStorage, Ownable {
 
   function requestNewAccessToken(
     address _patient,
+    uint _nonce,
+    bytes memory _signature,
     bool _assignAdminAsGuardian
   ) public returns (uint256) {
+    require(
+      verify(_patient, "Create HealthWalletAccess token", _nonce, _signature),
+      "HWA: Invalid signature"
+    );
     require(balanceOf(_patient) == 0, "HWA: One token per patient allowed");
     uint256 newTokenId = _tokenIds.current();
     _mint(_patient, newTokenId);
