@@ -44,7 +44,7 @@ describe("HealthWallet Backup", function () {
           nonce
         );
 
-        expect(
+        await expect(
           await hwaContract.requestNewAccessToken(
             patient.address,
             nonce,
@@ -53,7 +53,7 @@ describe("HealthWallet Backup", function () {
           )
         )
           .to.emit(hwaContract, "Transfer")
-          .withArgs(0, patient.address);
+          .withArgs(ethers.BigNumber.from(0), patient.address, 1);
       });
 
       it("should not allow more than one token per patient", async () => {

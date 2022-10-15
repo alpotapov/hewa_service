@@ -16,7 +16,9 @@ contract HealthWalletAccess is ERC721URIStorage, Ownable, VerifySignature {
   event AccessTokenCreated(address patient, uint256 tokenId);
   event GuardianAssigned(address indexed guardian, uint256 tokenId);
 
-  constructor() ERC721("HealthWalletAccess", "HWA") {}
+  constructor() ERC721("HealthWalletAccess", "HWA") {
+    _tokenIds.increment();
+  }
 
   function _assignGuardian(address _guardian, uint256 _tokenId) internal {
     require(!isGuardian(_guardian, _tokenId), "HWA: Already assigned as guardian for this token.");
