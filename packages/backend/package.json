@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@pinata/sdk": "^1.1.25",
+    "config": "^3.3.8",
     "ethers": "^5.7.1",
     "express": "^4.17.3",
     "multer": "^1.4.4",

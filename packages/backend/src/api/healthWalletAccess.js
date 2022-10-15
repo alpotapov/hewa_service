@@ -1,20 +1,21 @@
 const express = require('express');
 const ethers = require("ethers");
+const config = require('config');
 const router = express.Router();
 
 const artifacts = require('../contracts/hardhat_contracts.json');
-const CHAIN_ID = "31337";
-const CHAIN_NAME = "localhost";
+const CHAIN_ID = config.get('chainId');
+const CHAIN_NAME = config.get('chainName');
+const RPC_URL = config.get('rpcUrl');
 const { HealthWalletAccess } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
 // const privateKey = process.env.HWA_OWNER_PRIVATE_KEY;
 // const lighthouseApiKey = process.env.LIGHTHOUSE_API_KEY;
-const rpcUrl = 'http://localhost:8545';
 
 router.post('/', async (req, res) => {
   const { patientAddress, signedRequest, nonce } = req.body;
   const { abi: hwaABI, address: hwaAddress } = HealthWalletAccess;
 
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
   const contract = new ethers.Contract(hwaAddress, hwaABI, provider.getSigner());
 
   try {

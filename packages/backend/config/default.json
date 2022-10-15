@@ -1,0 +1,5 @@
+{
+  "chainId": "31337",
+  "chainName": "localhost",
+  "rpcUrl": "http://localhost:8545"
+}
