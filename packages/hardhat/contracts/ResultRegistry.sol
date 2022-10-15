@@ -15,8 +15,11 @@ contract ResultRegistry is Ownable {
   constructor () {}
 
   function authorizeDevice(address _newDevice) public onlyOwner() {
-    authorizedDevices[_newDevice] = true;
-    emit Authorized(_newDevice);
+    bool isAuthorized = authorizedDevices[_newDevice];
+    if (!isAuthorized) {
+      authorizedDevices[_newDevice] = true;
+      emit Authorized(_newDevice);
+    }
   }
 
   function removeDeviceAuthorization(address _device) public onlyOwner() {
