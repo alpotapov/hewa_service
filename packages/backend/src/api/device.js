@@ -17,12 +17,18 @@ const auth = basicAuth({
   }
 });
 
-router.post('/', auth, async (req, res) => {
-  const { deviceAddress } = req.body;
-  const { abi, address  } = ResultRegistry;
+const getResultRegistryContract = async () => {
+  const { abi, address } = ResultRegistry;
 
   const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
   const contract = new ethers.Contract(address, abi, provider.getSigner());
+
+  return { contract, provider };
+}
+
+router.post('/', auth, async (req, res) => {
+  const { deviceAddress } = req.body;
+  const { contract } = await getResultRegistryContract();
 
   try {
     const tx = await contract.authorizeDevice(
@@ -41,5 +47,24 @@ router.post('/', auth, async (req, res) => {
     res.status(400).send();
   }
 });
+
+router.post('/upload-result', async (req, res) => {
+  const { guid, deviceAddress, result, signature } = req.body;
+  
+  const { contract } = await getResultRegistryContract();
+
+  try {
+    const tx = await contract.publishResult(
+      deviceAddress, guid, result, signature
+    );
+    const txResult = await tx.wait();
+    console.log({ txResult });
+
+    res.status(201).send();
+  } catch(err) {
+    console.error('Failed to upload result', { err });
+    res.status(400).send();
+  }
+})
 
 module.exports = router;
