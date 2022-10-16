@@ -75,4 +75,27 @@ describe("ResultRegistry", () => {
       expect(savedResult).to.equal(results);
     });
   });
+
+  describe("Hashing without contract", () => {
+    let contract;
+    const guid = "12345abc-12454adaf-1235435adasdf";
+    const results = "0.12345";
+
+    before(async () => {
+      const { contract: c } = await prepareTest();
+      contract = c;
+    });
+
+    it("should produce output equal to output of getMessageHash", async () => {
+      const hashFromContract = await contract["getMessageHash(string,string)"](
+        results,
+        guid
+      );
+      const hash = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(`${results}${guid}`)
+      );
+
+      expect(hashFromContract).to.equal(hash);
+    });
+  });
 });
