@@ -44,16 +44,24 @@ describe("ResultRegistry", () => {
         "Authorized"
       );
     });
+  });
+
+  describe("Publishing results", () => {
+    let contract;
+    const guid = "12345abc-12454adaf-1235435adasdf";
+    const results = "0.12345";
+
+    before(async () => {
+      const { contract: c } = await prepareTest();
+      contract = c;
+    });
 
     it("should save result from the authorized device", async () => {
-      const { contract } = await prepareTest();
       const [, , device1] = await ethers.getSigners();
 
       await contract.authorizeDevice(device1.address);
 
-      const guid = "12345abc-12454adaf-1235435adasdf";
       const nonce = 1;
-      const results = "0.12345";
       const { signature } = await signResults(
         device1,
         contract,
@@ -72,6 +80,11 @@ describe("ResultRegistry", () => {
       )
         .to.emit(contract, "ResultPublished")
         .withArgs(guid);
+    });
+
+    it("should retrieve saved result", async () => {
+      const savedResult = await contract.getResult(guid);
+      expect(savedResult).to.equal(results);
     });
   });
 });

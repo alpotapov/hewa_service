@@ -54,4 +54,8 @@ contract ResultRegistry is Ownable, VerifySignature {
     results[_guid] = _result;
     emit ResultPublished(_guid);
   }
+
+  function getResult(string memory _guid) public view returns (string memory) {
+    return results[_guid];
+  }
 }
