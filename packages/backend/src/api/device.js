@@ -10,6 +10,7 @@ const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
 const RPC_URL = config.get('rpcUrl');
 const { ResultRegistry } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
+const PRIVATE_KEY = process.env.PK_OPERATOR;
 
 const auth = basicAuth({
   users: {
@@ -21,9 +22,11 @@ const getResultRegistryContract = async () => {
   const { abi, address } = ResultRegistry;
 
   const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-  const contract = new ethers.Contract(address, abi, provider.getSigner());
+  const wallet = new ethers.Wallet(PRIVATE_KEY);
+  const connectedWallet = wallet.connect(provider);
+  const contract = new ethers.Contract(address, abi, connectedWallet);
 
-  return { contract, provider };
+  return { contract };
 }
 
 router.post('/', auth, async (req, res) => {
