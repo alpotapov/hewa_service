@@ -10,11 +10,11 @@ const prepareTest = async () => {
   };
 };
 
-const signResults = async (signer, contract, nonce, results) => {
-  const hash = await contract.getMessageHash(results, nonce);
+const signResults = async (signer, contract, guid, results) => {
+  const hash = await contract["getMessageHash(string,string)"](results, guid);
   const signature = await signer.signMessage(ethers.utils.arrayify(hash));
 
-  return { signature, nonce };
+  return { signature, guid };
 };
 
 describe("ResultRegistry", () => {
@@ -61,22 +61,10 @@ describe("ResultRegistry", () => {
 
       await contract.authorizeDevice(device1.address);
 
-      const nonce = 1;
-      const { signature } = await signResults(
-        device1,
-        contract,
-        nonce,
-        results
-      );
+      const { signature } = await signResults(device1, contract, guid, results);
 
       await expect(
-        await contract.publishResult(
-          device1.address,
-          guid,
-          results,
-          nonce,
-          signature
-        )
+        await contract.publishResult(device1.address, guid, results, signature)
       )
         .to.emit(contract, "ResultPublished")
         .withArgs(guid);

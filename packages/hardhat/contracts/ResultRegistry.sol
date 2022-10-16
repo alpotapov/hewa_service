@@ -32,11 +32,29 @@ contract ResultRegistry is Ownable, VerifySignature {
     return authorizedDevices[_device];
   }
 
+  function getMessageHash(
+    string memory _a,
+    string memory _b
+  ) public pure returns (bytes32) {
+    return keccak256(abi.encodePacked(_a, _b));
+  }
+
+  function verify(
+        address _signer,
+        string memory _result,
+        string memory _guid,
+        bytes memory signature
+    ) public pure returns (bool) {
+        bytes32 messageHash = getMessageHash(_result, _guid);
+        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+
+        return recoverSigner(ethSignedMessageHash, signature) == _signer;
+    }
+
   function publishResult(
     address _device,
     string memory _guid,
     string memory _result,
-    uint _nonce,
     bytes memory _signature
   ) external {
     bytes memory result = bytes(results[_guid]);
@@ -47,7 +65,7 @@ contract ResultRegistry is Ownable, VerifySignature {
       "ResultRegistry: device not authorized"
     );
     require(
-      verify(_device, _result, _nonce, _signature),
+      verify(_device, _result, _guid, _signature),
       "ResultRegistry: wrong signature"
     );
 

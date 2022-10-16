@@ -3,10 +3,10 @@ pragma solidity >=0.8.0 <0.9.0;
 
 contract VerifySignature {
     function getMessageHash(
-        string memory _message,
-        uint _nonce
+        string memory _a,
+        uint _b
     ) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_message, _nonce));
+        return keccak256(abi.encodePacked(_a, _b));
     }
 
     function getEthSignedMessageHash(bytes32 _messageHash)
