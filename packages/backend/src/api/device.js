@@ -14,9 +14,17 @@ const PRIVATE_KEY = process.env.PK_OPERATOR;
 
 const auth = basicAuth({
   users: {
-    'admin': 'phyle',
+    'dx365admin': 'bloodtestsforall',
   }
 });
+
+const extractErrorMessage = (err) => {
+  try {
+    return JSON.parse(err.body).error.message;
+  } catch (e) {
+    return err.reason;
+  }
+}
 
 const getResultRegistryContract = async () => {
   const { abi, address } = ResultRegistry;
@@ -31,42 +39,39 @@ const getResultRegistryContract = async () => {
 
 router.post('/', auth, async (req, res) => {
   const { deviceAddress } = req.body;
+  console.log('Authorizing new device', deviceAddress);
+
   const { contract } = await getResultRegistryContract();
 
   try {
     const tx = await contract.authorizeDevice(
-      deviceAddress
+      deviceAddress, { gasLimit: 50000 }
     );
-    const result = await tx.wait();
-    const event = result.events.find((event) => event.event === 'DeviceAuthorized');
-    if (event) {
-      console.log('Successfuly authorized new device', { deviceAddress, event });
-      res.status(201).send();
-    } else {
-      res.status(204).send();
-    }
+    console.log('Submitted transaction to authorize device', tx.hash);
+    res.json({ transactionHash: tx.hash });
   } catch (err) {
-    console.error('Failed to authorize device', { deviceAddress, err });
-    res.status(400).send();
+    const errorMessage = extractErrorMessage(err);
+    console.error('Failed to authorize device', { deviceAddress, errorMessage });
+    res.status(400).json({ errorMessage }).send();
   }
 });
 
 router.post('/upload-result', async (req, res) => {
   const { guid, deviceAddress, result, signature } = req.body;
+  console.log('Uploading new result', deviceAddress);
   
   const { contract } = await getResultRegistryContract();
 
   try {
     const tx = await contract.publishResult(
-      deviceAddress, guid, result, signature
+      deviceAddress, guid, result, signature, { gasLimit: 60000 }
     );
-    const txResult = await tx.wait();
-    console.log({ txResult });
-
-    res.status(201).send();
+    console.log('Submitted transaction to upload result', tx.hash);
+    res.json(tx.hash);
   } catch(err) {
-    console.error('Failed to upload result', { err });
-    res.status(400).send();
+    const errorMessage = extractErrorMessage(err);
+    console.error('Failed to upload result', { errorMessage });
+    res.status(400).json({ errorMessage }).send();
   }
 })
 
