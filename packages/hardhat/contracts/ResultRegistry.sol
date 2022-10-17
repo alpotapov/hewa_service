@@ -17,11 +17,9 @@ contract ResultRegistry is Ownable, VerifySignature {
   constructor () {}
 
   function authorizeDevice(address _newDevice) public onlyOwner() {
-    bool isAuthorized = authorizedDevices[_newDevice];
-    if (!isAuthorized) {
-      authorizedDevices[_newDevice] = true;
-      emit Authorized(_newDevice);
-    }
+    require(!authorizedDevices[_newDevice], "ResultRegistry: device already authorized");
+    authorizedDevices[_newDevice] = true;
+    emit Authorized(_newDevice);
   }
 
   function removeDeviceAuthorization(address _device) public onlyOwner() {

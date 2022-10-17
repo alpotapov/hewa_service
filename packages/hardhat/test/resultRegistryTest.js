@@ -34,15 +34,12 @@ describe("ResultRegistry", () => {
         .to.be.reverted;
     });
 
-    it("should not emit event if device already authorized", async () => {
+    it("should revert if device already authorized", async () => {
       const { contract } = await prepareTest();
       const [, , device1] = await ethers.getSigners();
 
       await contract.authorizeDevice(device1.address);
-      await expect(await contract.authorizeDevice(device1.address)).to.not.emit(
-        contract,
-        "Authorized"
-      );
+      await expect(contract.authorizeDevice(device1.address)).to.be.reverted;
     });
   });
 
