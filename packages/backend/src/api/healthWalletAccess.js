@@ -6,10 +6,8 @@ const router = express.Router();
 const artifacts = require('../contracts/hardhat_contracts.json');
 const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
-const RPC_URL = config.get('rpcUrl');
+const RPC_URL = process.env.RPC_URL;
 const { HealthWalletAccess } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
-// const privateKey = process.env.HWA_OWNER_PRIVATE_KEY;
-// const lighthouseApiKey = process.env.LIGHTHOUSE_API_KEY;
 
 router.post('/', async (req, res) => {
   const { patientAddress, signedRequest, nonce } = req.body;

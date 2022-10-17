@@ -8,7 +8,7 @@ const router = express.Router();
 const artifacts = require('../contracts/hardhat_contracts.json');
 const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
-const RPC_URL = config.get('rpcUrl');
+const RPC_URL = process.env.RPC_URL;
 const { ResultRegistry } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
 const PRIVATE_KEY = process.env.PK_OPERATOR;
 
