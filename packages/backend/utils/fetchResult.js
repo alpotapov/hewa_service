@@ -1,9 +1,10 @@
 const ethers = require('ethers');
 
 const artifacts = require('../src/contracts/hardhat_contracts.json');
-const CHAIN_ID = "31337";
-const CHAIN_NAME = "localhost";
-const RPC_URL = "http://localhost:8545";
+
+const CHAIN_ID = '31337';
+const CHAIN_NAME = 'localhost';
+const RPC_URL = 'http://localhost:8545';
 const { ResultRegistry } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
 
 const fetchResult = async (guid) => {
@@ -15,8 +16,8 @@ const fetchResult = async (guid) => {
   const result = await contract.getResult(guid);
 
   return result;
-}
+};
 
 export default {
-  fetchResult
-}
+  fetchResult,
+};

@@ -1,21 +1,22 @@
 const express = require('express');
-const ethers = require("ethers");
+const ethers = require('ethers');
 const basicAuth = require('express-basic-auth');
-const config = require("config");
+const config = require('config');
+
 const router = express.Router();
 
-
 const artifacts = require('../contracts/hardhat_contracts.json');
+
 const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
-const RPC_URL = process.env.RPC_URL;
+const { RPC_URL } = process.env;
 const { ResultRegistry } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
 const PRIVATE_KEY = process.env.PK_OPERATOR;
 
 const auth = basicAuth({
   users: {
-    'dx365admin': 'bloodtestsforall',
-  }
+    dx365admin: 'bloodtestsforall',
+  },
 });
 
 const extractErrorMessage = (err) => {
@@ -24,7 +25,7 @@ const extractErrorMessage = (err) => {
   } catch (e) {
     return err.reason;
   }
-}
+};
 
 const getResultRegistryContract = async () => {
   const { abi, address } = ResultRegistry;
@@ -35,7 +36,7 @@ const getResultRegistryContract = async () => {
   const contract = new ethers.Contract(address, abi, connectedWallet);
 
   return { contract };
-}
+};
 
 router.post('/', auth, async (req, res) => {
   const { deviceAddress } = req.body;
@@ -44,9 +45,7 @@ router.post('/', auth, async (req, res) => {
   const { contract } = await getResultRegistryContract();
 
   try {
-    const tx = await contract.authorizeDevice(
-      deviceAddress, { gasLimit: 50000 }
-    );
+    const tx = await contract.authorizeDevice(deviceAddress, { gasLimit: 50000 });
     console.log('Submitted transaction to authorize device', tx.hash);
     res.json({ transactionHash: tx.hash });
   } catch (err) {
@@ -57,22 +56,22 @@ router.post('/', auth, async (req, res) => {
 });
 
 router.post('/upload-result', async (req, res) => {
-  const { guid, deviceAddress, result, signature } = req.body;
+  const {
+    guid, deviceAddress, result, signature,
+  } = req.body;
   console.log('Uploading new result', deviceAddress);
-  
+
   const { contract } = await getResultRegistryContract();
 
   try {
-    const tx = await contract.publishResult(
-      deviceAddress, guid, result, signature, { gasLimit: 60000 }
-    );
+    const tx = await contract.publishResult(deviceAddress, guid, result, signature, { gasLimit: 60000 });
     console.log('Submitted transaction to upload result', tx.hash);
     res.json(tx.hash);
-  } catch(err) {
+  } catch (err) {
     const errorMessage = extractErrorMessage(err);
     console.error('Failed to upload result', { errorMessage });
     res.status(400).json({ errorMessage }).send();
   }
-})
+});
 
 module.exports = router;
