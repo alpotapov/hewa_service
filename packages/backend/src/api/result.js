@@ -4,10 +4,15 @@ const router = express.Router();
 
 const contractDomain = require('../domain/contract');
 
-router.get('/:guid', async (req, res) => {
-  const { guid } = req.params;
+router.get('/:guids', async (req, res) => {
+  const { guids } = req.params;
 
-  const result = await contractDomain.triggerViewMethod('ResultRegistry', 'getResult', [guid]);
+  const guidsList = guids.split(';');
+  const result = await Promise.all(
+    guidsList.map(
+      (guid) => contractDomain.triggerViewMethod('ResultRegistry', 'getResult', [guid]),
+    ),
+  );
 
   res.json(result);
 });
