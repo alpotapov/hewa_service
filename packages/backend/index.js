@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const config = require('config');
+const cors = require('cors');
 
 const healthWalletAccessApi = require('./src/api/healthWalletAccess');
 const deviceApi = require('./src/api/device');
@@ -11,6 +12,7 @@ const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
 
 const app = express();
+app.use(cors());
 app.use(express.json({ extended: true }));
 app.use('/data', express.static(path.join(__dirname, 'public')));
 
