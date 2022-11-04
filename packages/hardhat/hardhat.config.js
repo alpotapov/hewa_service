@@ -59,7 +59,7 @@ module.exports = {
 
   networks: {
     localhost: {
-      url: "http://localhost:8545",
+      url: "http://127.0.0.1:8545",
       /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
@@ -74,13 +74,11 @@ module.exports = {
     },
     goerli: {
       url: "https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-      accounts: [process.env.PK_OPERATOR],
+      accounts: [process.env.HEWA_TESTNET_DEPLOYER],
     },
     polygon: {
       url: "https://polygon-rpc.com",
-      accounts: {
-        mnemonic: mnemonic(),
-      },
+      accounts: [process.env.HEWA_MAINNET_DEPLOYER],
     },
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",

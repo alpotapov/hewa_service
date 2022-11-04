@@ -4,14 +4,6 @@ const { ethers } = require("hardhat");
 
 const localChainId = "31337";
 
-// const sleep = (ms) =>
-//   new Promise((r) =>
-//     setTimeout(() => {
-//       console.log(`waited for ${(ms / 1000).toFixed(3)} seconds`);
-//       r();
-//     }, ms)
-//   );
-
 module.exports = async (hre) => {
   const { getNamedAccounts, deployments, getChainId } = hre;
   console.log({ hre: Object.keys(hre) });
@@ -26,8 +18,6 @@ module.exports = async (hre) => {
     log: true,
     // waitConfirmations: 5,
   });
-
-  // Getting a previously deployed contract
-  // const contract = await ethers.getContract("HealthWalletAccess", deployer);
 };
+module.exports.skip = () => new Promise((resolve) => resolve(true));
 module.exports.tags = ["YourContract"];
