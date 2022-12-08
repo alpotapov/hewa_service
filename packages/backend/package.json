@@ -6,6 +6,7 @@
   "scripts": {
     "start": "env-cmd -f .env nodemon ./index.js",
     "start:testnet": "env-cmd -f .env.testnet nodemon ./index.js",
+    "start:polygon": "env-cmd -f .env.polygon nodemon ./index.js",
     "start:live": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
