@@ -5,6 +5,7 @@ const config = require('config');
 
 const router = express.Router();
 
+const gasStationService = require('../services/gasStationService');
 const artifacts = require('../contracts/hardhat_contracts.json');
 
 const CHAIN_ID = config.get('chainId');
@@ -43,9 +44,12 @@ router.post('/', auth, async (req, res) => {
   console.log('Authorizing new device', deviceAddress);
 
   const { contract } = await getResultRegistryContract();
-
+  const txParameters = {
+    gasLimit: 50000,
+    ...(await gasStationService.estimateGasPrice(CHAIN_ID)),
+  };
   try {
-    const tx = await contract.authorizeDevice(deviceAddress, { gasLimit: 50000 });
+    const tx = await contract.authorizeDevice(deviceAddress, txParameters);
     console.log('Submitted transaction to authorize device', tx.hash);
     res.json({ transactionHash: tx.hash });
   } catch (err) {
@@ -62,9 +66,13 @@ router.post('/upload-result', async (req, res) => {
   console.log('Uploading new result', deviceAddress);
 
   const { contract } = await getResultRegistryContract();
+  const txParameters = {
+    gasLimit: 60000,
+    ...(await gasStationService.estimateGasPrice(CHAIN_ID)),
+  };
 
   try {
-    const tx = await contract.publishResult(deviceAddress, guid, result, signature, { gasLimit: 60000 });
+    const tx = await contract.publishResult(deviceAddress, guid, result, signature, txParameters);
     console.log('Submitted transaction to upload result', tx.hash);
     res.json(tx.hash);
   } catch (err) {
