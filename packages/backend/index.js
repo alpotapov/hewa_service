@@ -13,7 +13,7 @@ const CHAIN_NAME = config.get('chainName');
 const app = express();
 app.use(cors());
 app.use((req, res, next) => {
-  console.log(`${Date.now()} ${req.method} ${req.url} ${JSON.stringify(req.body)} ${JSON.stringify(req.query)}`);
+  console.log(`${req.method} ${req.url} ${JSON.stringify(req.body)} ${JSON.stringify(req.query)}`);
   next();
 });
 app.use(express.json({ extended: true }));
