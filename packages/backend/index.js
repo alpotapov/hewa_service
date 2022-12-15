@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const config = require('config');
 const cors = require('cors');
+const db = require('./db');
 
 const deviceApi = require('./src/api/device');
 const resultApi = require('./src/api/result');
@@ -21,8 +22,9 @@ app.use('/data', express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/device', deviceApi);
 app.use('/api/v1/result', resultApi);
 
-// db.testConnection().then(() => db.sequelize.sync());
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-  console.log(`Network: ${CHAIN_ID} - ${CHAIN_NAME}`);
-});
+db.testConnection().then(() => db.sequelize.sync()).then(
+  app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+    console.log(`Network: ${CHAIN_ID} - ${CHAIN_NAME}`);
+  }),
+);
