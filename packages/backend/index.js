@@ -6,16 +6,15 @@ const cors = require('cors');
 const deviceApi = require('./src/api/device');
 const resultApi = require('./src/api/result');
 
+const requestLogger = require('./src/middleware/requestLogger');
+
 const PORT = process.env.PORT || 3011;
 const CHAIN_ID = config.get('chainId');
 const CHAIN_NAME = config.get('chainName');
 
 const app = express();
 app.use(cors());
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} ${JSON.stringify(req.body)} ${JSON.stringify(req.query)}`);
-  next();
-});
+app.use(requestLogger);
 app.use(express.json({ extended: true }));
 app.use('/data', express.static(path.join(__dirname, 'public')));
 
