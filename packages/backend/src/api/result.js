@@ -19,9 +19,9 @@ router.get('/:guids', async (req, res) => {
 });
 
 router.post('/subscribe', async (req, res) => {
-  const { guid, pushToken, resultRegistryAddress } = req.body;
+  const { guid, pushToken } = req.body;
 
-  await notificationDomain.subscribe(guid, resultRegistryAddress, pushToken);
+  await notificationDomain.subscribe(guid, pushToken);
 
   res.status(200).send();
 });

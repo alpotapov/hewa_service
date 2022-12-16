@@ -6,6 +6,8 @@ const config = require('config');
 const router = express.Router();
 
 const gasStationService = require('../services/gasStationService');
+const resultRegistryDomain = require('../domain/resultRegistry');
+const notificationDomain = require('../domain/notification');
 const artifacts = require('../contracts/hardhat_contracts.json');
 
 const CHAIN_ID = config.get('chainId');
@@ -65,21 +67,23 @@ router.post('/upload-result', async (req, res) => {
   } = req.body;
   console.log('Uploading new result', deviceAddress);
 
-  const { contract } = await getResultRegistryContract();
-  const txParameters = {
-    gasLimit: 60000,
-    ...(await gasStationService.estimateGasPrice(CHAIN_ID)),
-  };
+  const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
+    deviceAddress,
+    guid,
+    result,
+    signature,
+  );
 
-  try {
-    const tx = await contract.publishResult(deviceAddress, guid, result, signature, txParameters);
-    console.log('Submitted transaction to upload result', tx.hash);
-    res.json(tx.hash);
-  } catch (err) {
-    const errorMessage = extractErrorMessage(err);
-    console.error('Failed to upload result', { errorMessage });
+  if (errorMessage) {
+    console.error('Failed to upload result', errorMessage);
     res.status(400).json({ errorMessage }).send();
+    return;
   }
+  console.log('Submitted transaction to upload result', { transactionHash, guid });
+
+  await notificationDomain.transactionSent(guid, transactionHash);
+
+  res.json(transactionHash);
 });
 
 module.exports = router;
