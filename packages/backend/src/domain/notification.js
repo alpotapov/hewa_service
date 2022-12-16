@@ -15,7 +15,7 @@ const subscribe = async (guid, pushToken) => {
   return notification;
 };
 
-const transactionSent = async (guid, transactionHash) => {
+const onTransactionSent = async (guid, transactionHash) => {
   const notificationExists = await resultNotificationRepository.exists({
     guid,
   });
@@ -31,6 +31,27 @@ const transactionSent = async (guid, transactionHash) => {
   });
 };
 
+const sendPushNotification = async (pushToken) => {
+  console.log('Sending push notification', pushToken);
+};
+
+const onTransactionMined = async (transactionHash) => {
+  const notification = await resultNotificationRepository.findByTransactionHash(
+    transactionHash,
+  );
+
+  if (!notification) {
+    return;
+  }
+
+  await sendPushNotification(notification.pushToken);
+
+  await resultNotificationRepository.update({
+    guid: notification.guid,
+    state: NotificationStates.RESULTREADY,
+  });
+};
+
 const getAwaitedTransactions = async () => {
   const notifications = await resultNotificationRepository.findInState(
     NotificationStates.AWAITINGTRANSACTION,
@@ -41,6 +62,7 @@ const getAwaitedTransactions = async () => {
 
 module.exports = {
   subscribe,
-  transactionSent,
+  onTransactionSent,
+  onTransactionMined,
   getAwaitedTransactions,
 };

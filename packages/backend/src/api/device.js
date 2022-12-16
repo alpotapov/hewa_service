@@ -81,7 +81,7 @@ router.post('/upload-result', async (req, res) => {
   }
   console.log('Submitted transaction to upload result', { transactionHash, guid });
 
-  await notificationDomain.transactionSent(guid, transactionHash);
+  await notificationDomain.onTransactionSent(guid, transactionHash);
 
   res.json({ transactionHash });
 });

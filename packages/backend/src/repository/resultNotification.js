@@ -16,7 +16,7 @@ const update = async (notification) => {
 
 const exists = async (notification) => {
   const existingNotification = await ResultNotification.findOne({
-    wbhere: { guid: notification.guid },
+    where: { guid: notification.guid },
   });
 
   return !!existingNotification;
@@ -30,9 +30,16 @@ const findInState = async (state) => {
   return notifications;
 };
 
+const findByTransactionHash = async (transactionHash) => {
+  const notification = await ResultNotification.findOne({ where: { transactionHash } });
+
+  return notification;
+};
+
 module.exports = {
   create,
   update,
   exists,
   findInState,
+  findByTransactionHash,
 };
