@@ -1,4 +1,5 @@
 const ethers = require('ethers');
+const uuid = require('uuid').v4;
 
 const prepareResult = async (pk, result, guid) => {
   const hash = ethers.utils.keccak256(
@@ -15,6 +16,20 @@ const prepareResult = async (pk, result, guid) => {
   };
 };
 
+const generateNewResult = async (pk) => {
+  const guid = uuid();
+  const result = Math.floor(Math.random() * (150 - 50 + 1) + 50).toString();
+  const { deviceAddress, signature } = await prepareResult(pk, result, guid);
+
+  return JSON.stringify({
+    guid,
+    result,
+    deviceAddress,
+    signature,
+  });
+};
+
 module.exports = {
   prepareResult,
+  generateNewResult,
 };

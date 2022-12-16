@@ -83,7 +83,7 @@ router.post('/upload-result', async (req, res) => {
 
   await notificationDomain.transactionSent(guid, transactionHash);
 
-  res.json(transactionHash);
+  res.json({ transactionHash });
 });
 
 module.exports = router;
