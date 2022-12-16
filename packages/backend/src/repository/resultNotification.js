@@ -22,8 +22,17 @@ const exists = async (notification) => {
   return !!existingNotification;
 };
 
+const findInState = async (state) => {
+  const notifications = await ResultNotification.findAll({
+    where: { state },
+  });
+
+  return notifications;
+};
+
 module.exports = {
   create,
   update,
   exists,
+  findInState,
 };

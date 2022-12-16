@@ -31,7 +31,16 @@ const transactionSent = async (guid, transactionHash) => {
   });
 };
 
+const getAwaitedTransactions = async () => {
+  const notifications = await resultNotificationRepository.findInState(
+    NotificationStates.AWAITINGTRANSACTION,
+  );
+
+  return notifications.map((notification) => notification.transactionHash);
+};
+
 module.exports = {
   subscribe,
   transactionSent,
+  getAwaitedTransactions,
 };

@@ -7,6 +7,8 @@ const db = require('./db');
 const deviceApi = require('./src/api/device');
 const resultApi = require('./src/api/result');
 
+const transactionWatcher = require('./src/jobs/transactionWatcher');
+
 const requestLogger = require('./src/middleware/requestLogger');
 
 const PORT = process.env.PORT || 3011;
@@ -22,7 +24,7 @@ app.use('/data', express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/device', deviceApi);
 app.use('/api/v1/result', resultApi);
 
-db.testConnection().then(() => db.sequelize.sync()).then(
+db.testConnection().then(() => db.sequelize.sync()).then(() => transactionWatcher.run()).then(
   app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
     console.log(`Network: ${CHAIN_ID} - ${CHAIN_NAME}`);
