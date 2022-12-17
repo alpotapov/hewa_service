@@ -3,9 +3,10 @@ const db = require('../../../db');
 
 const NotificationStates = {
   PENDING: 'PENDING',
-  TESTONGOING: 'TESTONGOING',
-  AWAITINGTRANSACTION: 'AWAITINGTRANSACTION',
-  RESULTREADY: 'RESULTREADY',
+  AWAITING_DEVICE_OUTPUT: 'AWAITING_DEVICE_OUTPUT',
+  AWAITING_TRANSACTION: 'AWAITING_TRANSACTION',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
 };
 
 const ResultNotification = db.sequelize.define('ResultNotification', {

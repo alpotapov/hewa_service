@@ -28,7 +28,7 @@ const onTransactionSent = async (guid, transactionHash) => {
   await resultNotificationRepository.update({
     guid,
     transactionHash,
-    state: NotificationStates.AWAITINGTRANSACTION,
+    state: NotificationStates.AWAITING_TRANSACTION,
   });
 };
 
@@ -41,22 +41,31 @@ const onTransactionMined = async (transactionHash) => {
     return;
   }
 
-  await pushNotificationService.send(notification.pushToken, {
-    body: 'Your result is ready',
-    data: {
+  try {
+    await pushNotificationService.send(notification.pushToken, {
+      body: 'Your result is ready',
+      data: {
+        guid: notification.guid,
+      },
+    });
+  } catch (error) {
+    await resultNotificationRepository.update({
       guid: notification.guid,
-    },
-  });
+      state: NotificationStates.FAILED,
+    });
+
+    throw error;
+  }
 
   await resultNotificationRepository.update({
     guid: notification.guid,
-    state: NotificationStates.RESULTREADY,
+    state: NotificationStates.NOTIFICATION_SENT,
   });
 };
 
 const getAwaitedTransactions = async () => {
   const notifications = await resultNotificationRepository.findInState(
-    NotificationStates.AWAITINGTRANSACTION,
+    NotificationStates.AWAITING_TRANSACTION,
   );
 
   return notifications.map((notification) => notification.transactionHash);

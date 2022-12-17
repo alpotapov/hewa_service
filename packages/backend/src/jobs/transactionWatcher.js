@@ -6,15 +6,19 @@ const run = async () => {
 
   setInterval(() => {
     notificationDomain.getAwaitedTransactions().then((transactionHashes) => {
-      Promise.all(
-        transactionHashes.map((txHash) => transactionDomain.isMined(txHash)),
-      ).then((results) => {
-        results.forEach((isMined, index) => {
-          if (isMined) {
-            notificationDomain.onTransactionMined(transactionHashes[index]);
-          }
-        });
-      });
+      Promise.all(transactionHashes.map((txHash) => transactionDomain.isMined(txHash))).then(
+        (results) => {
+          results.forEach((isMined, index) => {
+            if (isMined) {
+              notificationDomain
+                .onTransactionMined(transactionHashes[index])
+                .catch((error) => console.warn(
+                  `notificationDomain.onTransactionMined handler failed: ${error.message}`,
+                ));
+            }
+          });
+        },
+      );
     });
   }, 10000);
 };
