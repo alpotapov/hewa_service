@@ -41,7 +41,12 @@ const onTransactionMined = async (transactionHash) => {
     return;
   }
 
-  await pushNotificationService.send(notification.pushToken);
+  await pushNotificationService.send(notification.pushToken, {
+    body: 'Your result is ready',
+    data: {
+      guid: notification.guid,
+    },
+  });
 
   await resultNotificationRepository.update({
     guid: notification.guid,
