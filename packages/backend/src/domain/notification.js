@@ -1,5 +1,6 @@
 const resultNotificationRepository = require('../repository/resultNotification');
 const { NotificationStates } = require('../repository/models/resultNotification');
+const pushNotificationService = require('../services/pushNotificationService');
 
 // eslint-disable-next-line no-unused-vars
 const checkState = async (guid) => NotificationStates.PENDING;
@@ -31,10 +32,6 @@ const onTransactionSent = async (guid, transactionHash) => {
   });
 };
 
-const sendPushNotification = async (pushToken) => {
-  console.log('Sending push notification', pushToken);
-};
-
 const onTransactionMined = async (transactionHash) => {
   const notification = await resultNotificationRepository.findByTransactionHash(
     transactionHash,
@@ -44,7 +41,7 @@ const onTransactionMined = async (transactionHash) => {
     return;
   }
 
-  await sendPushNotification(notification.pushToken);
+  await pushNotificationService.send(notification.pushToken);
 
   await resultNotificationRepository.update({
     guid: notification.guid,
