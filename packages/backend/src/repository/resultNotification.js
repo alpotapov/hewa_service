@@ -17,6 +17,7 @@ const update = async (notification) => {
 const exists = async (notification) => {
   const existingNotification = await ResultNotification.findOne({
     where: { guid: notification.guid },
+    logging: false,
   });
 
   return !!existingNotification;
@@ -25,13 +26,17 @@ const exists = async (notification) => {
 const findInState = async (state) => {
   const notifications = await ResultNotification.findAll({
     where: { state },
+    logging: false,
   });
 
   return notifications;
 };
 
 const findByTransactionHash = async (transactionHash) => {
-  const notification = await ResultNotification.findOne({ where: { transactionHash } });
+  const notification = await ResultNotification.findOne({
+    where: { transactionHash },
+    logging: false,
+  });
 
   return notification;
 };
