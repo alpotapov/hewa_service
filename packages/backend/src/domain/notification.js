@@ -59,7 +59,7 @@ const onTransactionMined = async (transactionHash) => {
 
   await resultNotificationRepository.update({
     guid: notification.guid,
-    state: NotificationStates.NOTIFICATION_SENT,
+    state: NotificationStates.SENT,
   });
 };
 
