@@ -21,7 +21,12 @@ router.get('/:guids', async (req, res) => {
 router.post('/subscribe', async (req, res) => {
   const { guid, pushToken } = req.body;
 
-  await notificationDomain.subscribe(guid, pushToken);
+  try {
+    await notificationDomain.subscribe(guid, pushToken);
+  } catch (err) {
+    console.error(`Failed to subscribe for notifications about ${guid}`, err);
+    res.status(500).json({ errorMessage: err.message }).send();
+  }
 
   res.status(200).send();
 });

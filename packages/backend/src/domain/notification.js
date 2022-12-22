@@ -2,15 +2,12 @@ const resultNotificationRepository = require('../repository/resultNotification')
 const { NotificationStates } = require('../repository/models/resultNotification');
 const pushNotificationService = require('../services/pushNotificationService');
 
-// eslint-disable-next-line no-unused-vars
-const checkState = async (guid) => NotificationStates.PENDING;
-
 const subscribe = async (guid, pushToken) => {
-  const state = await checkState(guid);
+  // TODO: do not create ResultNotification if result is already available
   const notification = await resultNotificationRepository.create({
     guid,
     pushToken,
-    state,
+    state: NotificationStates.PENDING,
   });
 
   return notification;
