@@ -2,18 +2,44 @@ const resultNotificationRepository = require('../repository/resultNotification')
 const { NotificationStates } = require('../repository/models/resultNotification');
 const pushNotificationService = require('../services/pushNotificationService');
 
-// eslint-disable-next-line no-unused-vars
-const checkState = async (guid) => NotificationStates.PENDING;
+const sendResultAvailableNotification = async (notification) => {
+  await pushNotificationService.send(notification.pushToken, {
+    body: 'Your result is ready',
+    data: {
+      guid: notification.guid,
+    },
+  });
+};
 
 const subscribe = async (guid, pushToken) => {
-  const state = await checkState(guid);
-  const notification = await resultNotificationRepository.create({
+  const notification = await resultNotificationRepository.get(guid);
+  if (!notification) {
+    const newNotification = await resultNotificationRepository.create({
+      guid,
+      pushToken,
+      state: NotificationStates.PENDING,
+    });
+
+    return newNotification;
+  }
+
+  if (notification.state === NotificationStates.AWAITING_PUSH_TOKEN) {
+    await sendResultAvailableNotification(notification);
+    const updatedNotification = await resultNotificationRepository.update({
+      guid,
+      pushToken,
+      state: NotificationStates.SENT,
+    });
+
+    return updatedNotification;
+  }
+
+  const updatedNotification = await resultNotificationRepository.update({
     guid,
     pushToken,
-    state,
   });
 
-  return notification;
+  return updatedNotification;
 };
 
 const onTransactionSent = async (guid, transactionHash) => {
@@ -22,6 +48,12 @@ const onTransactionSent = async (guid, transactionHash) => {
   });
 
   if (!notificationExists) {
+    await resultNotificationRepository.create({
+      guid,
+      transactionHash,
+      state: NotificationStates.AWAITING_TRANSACTION,
+    });
+
     return;
   }
 
@@ -38,16 +70,20 @@ const onTransactionMined = async (transactionHash) => {
   );
 
   if (!notification) {
+    throw new Error(`ResultNotification not found for ${transactionHash}`);
+  }
+
+  if (!notification.pushToken) {
+    await resultNotificationRepository.update({
+      guid: notification.guid,
+      state: NotificationStates.AWAITING_PUSH_TOKEN,
+    });
+
     return;
   }
 
   try {
-    await pushNotificationService.send(notification.pushToken, {
-      body: 'Your result is ready',
-      data: {
-        guid: notification.guid,
-      },
-    });
+    await sendResultAvailableNotification(notification);
   } catch (error) {
     await resultNotificationRepository.update({
       guid: notification.guid,

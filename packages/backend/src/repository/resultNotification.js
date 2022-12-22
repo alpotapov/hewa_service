@@ -41,10 +41,20 @@ const findByTransactionHash = async (transactionHash) => {
   return notification;
 };
 
+const get = async (guid) => {
+  const notification = await ResultNotification.findOne({
+    where: { guid },
+    logging: false,
+  });
+
+  return notification;
+};
+
 module.exports = {
   create,
   update,
   exists,
   findInState,
   findByTransactionHash,
+  get,
 };

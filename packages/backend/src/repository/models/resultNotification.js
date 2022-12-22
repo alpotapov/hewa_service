@@ -5,6 +5,7 @@ const NotificationStates = {
   PENDING: 'PENDING',
   AWAITING_DEVICE_OUTPUT: 'AWAITING_DEVICE_OUTPUT',
   AWAITING_TRANSACTION: 'AWAITING_TRANSACTION',
+  AWAITING_PUSH_TOKEN: 'AWAITING_PUSH_TOKEN',
   SENT: 'SENT',
   FAILED: 'FAILED',
 };
@@ -16,7 +17,7 @@ const ResultNotification = db.sequelize.define('ResultNotification', {
   },
   pushToken: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true,
   },
   state: {
     type: DataTypes.ENUM(Object.keys(NotificationStates).map((key) => NotificationStates[key])),
