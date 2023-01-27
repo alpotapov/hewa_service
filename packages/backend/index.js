@@ -6,6 +6,7 @@ const db = require('./db');
 
 const deviceApi = require('./src/api/device');
 const resultApi = require('./src/api/result');
+const healthcheckApi = require('./src/api/healthcheck');
 
 const transactionWatcher = require('./src/jobs/transactionWatcher');
 
@@ -23,6 +24,7 @@ app.use('/data', express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1/device', deviceApi);
 app.use('/api/v1/result', resultApi);
+app.use('/api/v1/healthcheck', healthcheckApi);
 
 db.testConnection().then(() => db.sequelize.sync()).then(() => transactionWatcher.run()).then(
   app.listen(PORT, () => {
