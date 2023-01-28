@@ -1,5 +1,6 @@
 const ethers = require('ethers');
 const config = require('config');
+const { Web3Storage } = require('web3.storage');
 
 const gasStationService = require('../services/gasStationService');
 const artifacts = require('../contracts/hardhat_contracts.json');
@@ -9,6 +10,7 @@ const CHAIN_NAME = config.get('chainName');
 const { RPC_URL } = process.env;
 const { ResultRegistry } = artifacts[CHAIN_ID][CHAIN_NAME].contracts;
 const PRIVATE_KEY = process.env.PK_OPERATOR;
+const { WEB3_STORAGE_TOKEN } = process.env;
 
 const getResultRegistryContract = async () => {
   const { abi, address } = ResultRegistry;
@@ -45,6 +47,13 @@ const uploadResult = async (deviceAddress, guid, result, signature) => {
   }
 };
 
+const uploadResultToIpfs = async (stringifiedResult) => {
+  const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
+  const cid = await client.put([new Blob([stringifiedResult])]);
+  return cid;
+};
+
 module.exports = {
   uploadResult,
+  uploadResultToIpfs,
 };

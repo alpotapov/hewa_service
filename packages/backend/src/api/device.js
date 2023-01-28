@@ -63,9 +63,17 @@ router.post('/', auth, async (req, res) => {
 
 router.post('/upload-result', async (req, res) => {
   const {
-    guid, deviceAddress, result, signature,
+    guid, deviceAddress, result, signature, stringifiedResult,
   } = req.body;
+  console.log({ stringifiedResult });
   console.log('Uploading new result', deviceAddress);
+
+  const resultCid = await resultRegistryDomain.uploadResultToIpfs(stringifiedResult);
+
+  if (resultCid !== result) {
+    console.error('CIDs not matching', { resultCid, result });
+    throw new Error('Result CID does not match the one in the request');
+  }
 
   const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
     deviceAddress,
