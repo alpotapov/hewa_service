@@ -61,24 +61,31 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+router.post('/calculate-cid', async (req, res) => {
+  const { result } = req.body;
+  const root = await resultRegistryDomain.calculateCid(result);
+
+  res.json({ cid: root }).send();
+});
+
 router.post('/upload-result', async (req, res) => {
   const {
-    guid, deviceAddress, result, signature, stringifiedResult,
+    guid, deviceAddress, result: cid, signature, stringifiedResult,
   } = req.body;
-  console.log({ stringifiedResult });
   console.log('Uploading new result', deviceAddress);
 
-  const resultCid = await resultRegistryDomain.uploadResultToIpfs(stringifiedResult);
+  const actualCid = await resultRegistryDomain.uploadResultToIpfs(stringifiedResult);
 
-  if (resultCid !== result) {
-    console.error('CIDs not matching', { resultCid, result });
-    throw new Error('Result CID does not match the one in the request');
+  if (actualCid !== cid) {
+    console.error('CIDs not matching', { actualCid, cid });
+    res.status(400).json({ errorMessage: 'Result CID does not match the one in the request' }).send();
+    return;
   }
 
   const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
     deviceAddress,
     guid,
-    result,
+    actualCid,
     signature,
   );
 
@@ -87,11 +94,11 @@ router.post('/upload-result', async (req, res) => {
     res.status(400).json({ errorMessage }).send();
     return;
   }
-  console.log('Submitted transaction to upload result', { transactionHash, guid });
+  console.log('Submitted transaction to upload result', { deviceAddress, transactionHash, guid });
 
   await notificationDomain.onTransactionSent(guid, transactionHash);
 
-  res.json({ transactionHash });
+  res.json({ transactionHash, guid, deviceAddress });
 });
 
 module.exports = router;

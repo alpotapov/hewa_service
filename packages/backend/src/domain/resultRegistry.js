@@ -1,6 +1,10 @@
 const ethers = require('ethers');
 const config = require('config');
-const { Web3Storage } = require('web3.storage');
+const { Web3Storage, File } = require('web3.storage');
+// eslint-disable-next-line import/no-unresolved
+const { pack } = require('ipfs-car/pack');
+// eslint-disable-next-line import/no-unresolved
+const { MemoryBlockStore } = require('ipfs-car/blockstore/memory');
 
 const gasStationService = require('../services/gasStationService');
 const artifacts = require('../contracts/hardhat_contracts.json');
@@ -49,11 +53,48 @@ const uploadResult = async (deviceAddress, guid, result, signature) => {
 
 const uploadResultToIpfs = async (stringifiedResult) => {
   const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
-  const cid = await client.put([new Blob([stringifiedResult])]);
+  const buffer = Buffer.from(stringifiedResult);
+  const files = [
+    new File([buffer], 'result.json'),
+  ];
+  const cid = await client.put(files, { wrapWithDirectory: false });
   return cid;
+};
+
+const toImportCandidate = (file) => {
+  let stream;
+  return {
+    path: file.name,
+    get content() {
+      stream = stream || file.stream();
+      return stream;
+    },
+  };
+};
+
+const calculateCid = async (stringifiedResult) => {
+  const buffer = Buffer.from(stringifiedResult);
+  const files = [
+    new File([buffer], 'result.json'),
+  ];
+  const MAX_BLOCK_SIZE = 1048576;
+  const blockstore = new MemoryBlockStore();
+  try {
+    const { root } = await pack({
+      input: Array.from(files).map(toImportCandidate),
+      blockstore,
+      wrapWithDirectory: false,
+      maxChunkSize: MAX_BLOCK_SIZE,
+      maxChildrenPerNode: 1024,
+    });
+    return root.toString();
+  } finally {
+    await blockstore.close();
+  }
 };
 
 module.exports = {
   uploadResult,
   uploadResultToIpfs,
+  calculateCid,
 };
