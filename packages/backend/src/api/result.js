@@ -2,11 +2,13 @@ const express = require('express');
 
 const router = express.Router();
 
+const globalErrorHandler = require('../middleware/globalErrorHandler');
+
 const contractDomain = require('../domain/contract');
 const notificationDomain = require('../domain/notification');
 const resultRegistryDomain = require('../domain/resultRegistry');
 
-router.get('/:guids', async (req, res) => {
+const getResults = async (req, res) => {
   const { guids } = req.params;
 
   const guidsList = guids.split(';');
@@ -21,9 +23,9 @@ router.get('/:guids', async (req, res) => {
   );
 
   res.json(records);
-});
+};
 
-router.post('/subscribe', async (req, res) => {
+const subscribe = async (req, res) => {
   const { guid, pushToken } = req.body;
 
   try {
@@ -34,6 +36,8 @@ router.post('/subscribe', async (req, res) => {
   }
 
   res.status(200).send();
-});
+};
 
+router.get('/:guids', globalErrorHandler(getResults));
+router.post('/subscribe', globalErrorHandler(subscribe));
 module.exports = router;
