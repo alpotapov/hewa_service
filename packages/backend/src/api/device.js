@@ -5,6 +5,8 @@ const config = require('config');
 
 const router = express.Router();
 
+const globalErrorHandler = require('../middleware/globalErrorHandler');
+
 const gasStationService = require('../services/gasStationService');
 const resultRegistryDomain = require('../domain/resultRegistry');
 const notificationDomain = require('../domain/notification');
@@ -68,7 +70,7 @@ router.post('/calculate-cid', async (req, res) => {
   res.json({ cid: root }).send();
 });
 
-router.post('/upload-result', async (req, res) => {
+const uploadResult = async (req, res) => {
   const {
     guid, deviceAddress, result: cid, signature, stringifiedResult,
   } = req.body;
@@ -83,10 +85,12 @@ router.post('/upload-result', async (req, res) => {
   }
 
   const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
-    deviceAddress,
-    guid,
-    actualCid,
-    signature,
+    {
+      deviceAddress,
+      guid,
+      result: actualCid,
+      signature,
+    },
   );
 
   if (errorMessage) {
@@ -99,6 +103,7 @@ router.post('/upload-result', async (req, res) => {
   await notificationDomain.onTransactionSent(guid, transactionHash);
 
   res.json({ transactionHash, guid, deviceAddress });
-});
+};
 
+router.post('/upload-result', globalErrorHandler(uploadResult));
 module.exports = router;
