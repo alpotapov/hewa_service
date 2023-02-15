@@ -35,10 +35,12 @@ const extractErrorMessage = (err) => {
   }
 };
 
-const uploadResult = async (deviceAddress, guid, result, signature) => {
+const uploadResult = async ({
+  deviceAddress, guid, result, signature,
+}) => {
   const { contract } = await getResultRegistryContract();
   const txParameters = {
-    gasLimit: 60000,
+    gasLimit: 120000,
     ...(await gasStationService.estimateGasPrice(CHAIN_ID)),
   };
 
@@ -93,8 +95,18 @@ const calculateCid = async (stringifiedResult) => {
   }
 };
 
+const fetchResultFromIpfs = async (cid) => {
+  const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
+  const response = await client.get(cid);
+  const files = await response.files();
+  const data = await Promise.all(files.map((file) => file.text()));
+  if (data.length !== 1) throw new Error('Invalid result');
+  return JSON.parse(data[0]);
+};
+
 module.exports = {
   uploadResult,
   uploadResultToIpfs,
   calculateCid,
+  fetchResultFromIpfs,
 };

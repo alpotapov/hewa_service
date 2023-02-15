@@ -4,6 +4,7 @@ const router = express.Router();
 
 const contractDomain = require('../domain/contract');
 const notificationDomain = require('../domain/notification');
+const resultRegistryDomain = require('../domain/resultRegistry');
 
 router.get('/:guids', async (req, res) => {
   const { guids } = req.params;
@@ -15,7 +16,11 @@ router.get('/:guids', async (req, res) => {
     ),
   );
 
-  res.json(result);
+  const records = await Promise.all(
+    result.map((cid) => resultRegistryDomain.fetchResultFromIpfs(cid)),
+  );
+
+  res.json(records);
 });
 
 router.post('/subscribe', async (req, res) => {
