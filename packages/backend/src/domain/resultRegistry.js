@@ -97,13 +97,20 @@ const calculateCid = async (stringifiedResult) => {
 
 const fetchResultFromIpfs = async (cid) => {
   if (cid === '') return {};
-  const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
-  const response = await client.get(cid);
-  if (!response.ok) return {};
-  const files = await response.files();
-  const data = await Promise.all(files.map((file) => file.text()));
-  if (data.length !== 1) throw new Error('Invalid result');
-  return JSON.parse(data[0]);
+  try {
+    const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
+    const response = await client.get(cid);
+    if (!response.ok) return {};
+    const files = await response.files();
+    console.log({ files });
+    if (files.length !== 1) throw new Error('Invalid result - too many files');
+    const data = await Promise.all(files.map((file) => file.text()));
+    if (data.length !== 1) throw new Error('Invalid result');
+    return JSON.parse(data[0]);
+  } catch (error) {
+    console.error(error);
+    return {};
+  }
 };
 
 module.exports = {

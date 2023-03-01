@@ -13,10 +13,12 @@ const ResultNotification = db.sequelize.define('ResultNotification', {
   guid: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: 'componsitIndex',
   },
   pushToken: {
     type: DataTypes.TEXT,
     allowNull: false,
+    unique: 'componsitIndex',
   },
   state: {
     type: DataTypes.ENUM(Object.keys(NotificationStates).map((key) => NotificationStates[key])),
