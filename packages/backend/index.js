@@ -26,9 +26,12 @@ app.use('/api/v1/device', deviceApi);
 app.use('/api/v1/result', resultApi);
 app.use('/api/v1/healthcheck', healthcheckApi);
 
-db.testConnection().then(() => db.sequelize.sync()).then(() => transactionWatcher.run()).then(
-  app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
-    console.log(`Network: ${CHAIN_ID} - ${CHAIN_NAME}`);
-  }),
-);
+db.testConnection()
+  .then(() => db.sequelize.sync())
+  .then(() => transactionWatcher.run())
+  .then(
+    app.listen(PORT, () => {
+      console.log(`Server listening on ${PORT}`);
+      console.log(`Network: ${CHAIN_ID} - ${CHAIN_NAME}`);
+    }),
+  );
