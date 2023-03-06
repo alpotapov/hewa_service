@@ -1,5 +1,6 @@
 const ethers = require('ethers');
 const config = require('config');
+const fetch = require('node-fetch');
 const { Web3Storage, File } = require('web3.storage');
 // eslint-disable-next-line import/no-unresolved
 const { pack } = require('ipfs-car/pack');
@@ -96,19 +97,16 @@ const calculateCid = async (stringifiedResult) => {
 };
 
 const fetchResultFromIpfs = async (cid) => {
-  if (cid === '') return {};
   try {
-    const client = new Web3Storage({ token: WEB3_STORAGE_TOKEN });
-    const response = await client.get(cid);
-    if (!response.ok) return {};
-    const files = await response.files();
-    console.log({ files });
-    if (files.length !== 1) throw new Error('Invalid result - too many files');
-    const data = await Promise.all(files.map((file) => file.text()));
-    if (data.length !== 1) throw new Error('Invalid result');
-    return JSON.parse(data[0]);
-  } catch (error) {
-    console.error(error);
+    const url = `https://${cid}.ipfs.dweb.link`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from IPFS, status code: ${response.status}`);
+    }
+    const data = await response.buffer();
+    return JSON.parse(data.toString());
+  } catch (err) {
+    console.error(err);
     return {};
   }
 };
