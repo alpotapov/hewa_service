@@ -1,0 +1,9 @@
+{
+  "chainId": "31337",
+  "chainName": "localhost",
+  "db": {
+    "host": "localhost",
+    "name": "hewa_test",
+    "user": "hewa_user"
+  }
+}
