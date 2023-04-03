@@ -9,10 +9,13 @@ const resultRegistryDomain = require('./resultRegistry');
 
 const { PK_DEMO_APP } = process.env;
 
-// eslint-disable-next-line no-unused-vars
 const getDemoFhirRecord = (value) => {
   const filePath = path.join(__dirname, 'demoFhir.txt');
   return readFile(filePath, 'utf8')
+    .then((data) => {
+      const updatedData = data.replace(/##VALUE##/g, value);
+      return updatedData;
+    })
     .catch((err) => {
       console.error('Error reading the file:', err);
       throw err;
@@ -42,7 +45,7 @@ const uploadResult = async (uuid, fhirRecord) => {
     cid,
     uuid,
   );
-  console.log({
+  console.log('Using demo app to upload result', {
     deviceAddress, signature, cid, uuid,
   });
   const output = await resultRegistryDomain.uploadResult({

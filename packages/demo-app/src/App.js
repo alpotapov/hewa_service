@@ -68,6 +68,16 @@ function App() {
             <p className="mt-4">
               Scan the QR code with the HealthDrive app and add a new entry into your wallet.
             </p>
+            <div className="mt-4 block text-sm font-medium text-gray-700">Test Type</div>
+            <select
+              id="testType"
+              value={testType}
+              readOnly
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm focus:outline-none text-base text-gray-700"
+            >
+              <option>Vitamin D</option>
+              <option>Ferritin</option>
+            </select>
             <div className="mt-4">
               <QRCode value={qrCodeValue} />
             </div>
@@ -79,21 +89,7 @@ function App() {
               Refresh UUID
             </button>
             <h1 className="mt-8 text-lg font-semibold">Step 2: Send UUID</h1>
-            <div htmlFor="testType" className="mt-4 block text-sm font-medium text-gray-700">
-              Test Type
-            </div>
-            <select
-              id="testType"
-              value={testType}
-              readOnly
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm focus:outline-none text-base text-gray-700"
-            >
-              <option>Vitamin D</option>
-              <option>Ferritin</option>
-            </select>
-            <div htmlFor="testValue" className="mt-4 block text-sm font-medium text-gray-700">
-              Value
-            </div>
+            <div className="mt-4 block text-sm font-medium text-gray-700">Value</div>
             <input
               type="text"
               id="testValue"
