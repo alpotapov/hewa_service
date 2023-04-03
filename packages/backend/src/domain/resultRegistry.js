@@ -45,6 +45,8 @@ const uploadResult = async ({
     ...(await gasStationService.estimateGasPrice(CHAIN_ID)),
   };
 
+  // Check that the UUID is not already in the registry
+
   try {
     const tx = await contract.publishResult(deviceAddress, guid, result, signature, txParameters);
     return { transactionHash: tx.hash };
@@ -97,6 +99,7 @@ const calculateCid = async (stringifiedResult) => {
 };
 
 const fetchResultFromIpfs = async (cid) => {
+  if (!cid) return {};
   try {
     const url = `https://${cid}.ipfs.dweb.link`;
     const response = await fetch(url);
