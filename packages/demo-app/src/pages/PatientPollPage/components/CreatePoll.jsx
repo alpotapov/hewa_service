@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useMutation } from 'react-query';
+import { v4 as uuidv4 } from 'uuid';
+import pollService from '../../../services/pollService';
 
-function CreatePoll({ onPollCreated }) {
+function CreatePoll() {
   const [question, setQuestion] = useState('');
   const [answers, setAnswers] = useState(['']);
   const [from, setFrom] = useState('');
   const [frequency, setFrequency] = useState('daily');
+  const [uuid, setUuid] = useState(uuidv4());
+
+  const createPollMutation = useMutation(pollService.createPoll, {
+    onSuccess: () => {
+      setQuestion('');
+      setAnswers(['']);
+      setFrom('');
+      setFrequency('daily');
+      setUuid(uuidv4());
+    },
+  });
 
   const handleCreatePoll = () => {
     const poll = {
@@ -14,7 +27,7 @@ function CreatePoll({ onPollCreated }) {
       from,
       frequency,
     };
-    onPollCreated(poll);
+    createPollMutation.mutate(poll);
   };
 
   const handleAnswerChange = (event, index) => {
@@ -85,6 +98,17 @@ function CreatePoll({ onPollCreated }) {
                   <option value="weekly">Weekly</option>
                 </select>
               </div>
+              <div className="mb-5">
+                <div className="block mb-1">UUID:</div>
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  type="text"
+                  id="uuid"
+                  name="uuid"
+                  value={uuid}
+                  readOnly
+                />
+              </div>
               <button
                 type="button"
                 onClick={handleCreatePoll}
@@ -99,9 +123,5 @@ function CreatePoll({ onPollCreated }) {
     </div>
   );
 }
-
-CreatePoll.propTypes = {
-  onPollCreated: PropTypes.func.isRequired,
-};
 
 export default CreatePoll;

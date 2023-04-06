@@ -1,7 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
+import pollService from '../../../services/pollService';
 
-function ViewPolls({ polls }) {
+function ViewPolls() {
+  const { data: polls = [] } = useQuery('polls', pollService.getPolls);
+
   return (
     <div className="mt-10">
       <h2 className="text-xl font-bold mb-5">Created Polls</h2>
@@ -19,8 +22,6 @@ function ViewPolls({ polls }) {
   );
 }
 
-ViewPolls.propTypes = {
-  polls: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-};
+ViewPolls.propTypes = {};
 
 export default ViewPolls;
