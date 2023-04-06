@@ -1,5 +1,7 @@
 import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import ViewPollPure from './ViewPollPure';
+import ResponsesTable from './ResponseTable';
 
 function ParentComponent() {
   const questionnaire = {
@@ -10,7 +12,29 @@ function ParentComponent() {
     uuid: 'd1b3499c-ad1b-4949-9fbe-8af066b90be4',
   };
 
-  return <ViewPollPure questionnaire={questionnaire} />;
+  const mockResponses = [
+    {
+      question: 'Have you taken your medication today?',
+      responseUuid: uuidv4(),
+      responses: [
+        {
+          timeCreated: '2023-04-01T12:00:00.000Z',
+          response: "Yes, I've taken it as prescribed.",
+        },
+        {
+          timeCreated: '2023-04-02T12:00:00.000Z',
+          response: "I don't have any medication to take today.",
+        },
+      ],
+    },
+  ];
+
+  return (
+    <div className="pb-8">
+      <ViewPollPure questionnaire={questionnaire} />
+      <ResponsesTable responses={mockResponses} />
+    </div>
+  );
 }
 
 export default ParentComponent;

@@ -7,11 +7,16 @@ function ViewPollPure({ questionnaire }) {
 
   return (
     <div className="bg-gray-100">
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto pb-8">
+        <div className="w-full text-2xl font-light text-center">Questionnaire</div>
+        <div className="w-full text-md font-light text-center text-gray-500">{uuid}</div>
+        <div className="h-2 bg-indigo-600 rounded-t-md mt-2" />
         <div className="bg-white p-8 rounded-lg shadow-md flex flex-col md:flex-row">
           <div className="md:w-1/2 p-4 border-r-0 md:border-r-2 border-gray-300">
             <div className="text-center">
-              <QRCode value={uuid} size={256} />
+              <div className="flex flex-col md:flex-row justify-between md:justify-around items-center">
+                <QRCode value={uuid} size={256} />
+              </div>
               <p className="mt-4 text-lg text-gray-600">
                 Please scan the QR code using your HealthDrive app.
               </p>
@@ -32,7 +37,8 @@ function ViewPollPure({ questionnaire }) {
               <strong className="text-gray-800">Frequency:</strong> {frequency}
             </p>
             <p className="mt-4 text-lg text-gray-600">
-              By scanning the QR code, you&apos;ll be subscribing to the questionnaire on the right.
+              Scan QR code and add this questionnaire to your HealthDrive. You agree to receive{' '}
+              {frequency} reminders to answer the questions
             </p>
           </div>
         </div>
