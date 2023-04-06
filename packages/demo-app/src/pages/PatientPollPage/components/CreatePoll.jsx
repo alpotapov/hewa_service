@@ -4,9 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import pollService from '../../../services/pollService';
 
 function CreatePoll() {
-  const [question, setQuestion] = useState('');
-  const [answers, setAnswers] = useState(['']);
-  const [from, setFrom] = useState('');
+  const [question, setQuestion] = useState('Have you taken your medication today?');
+  const [answers, setAnswers] = useState([
+    "Yes, I've taken it as prescribed.",
+    "I don't have any medication to take today.",
+  ]);
+  const [from, setFrom] = useState('Mgr. Jakub Pětioký MBA');
   const [frequency, setFrequency] = useState('daily');
   const [uuid, setUuid] = useState(uuidv4());
 
@@ -20,15 +23,19 @@ function CreatePoll() {
     },
   });
 
-  const handleCreatePoll = () => {
+  const handleCreatePoll = async () => {
     const poll = {
       question,
       answers: answers.filter((answer) => answer.trim() !== ''),
       from,
       frequency,
     };
-    createPollMutation.mutate(poll);
+    await createPollMutation.mutate(poll);
   };
+
+  React.useEffect(() => {
+    console.log({ data: createPollMutation.data });
+  }, [createPollMutation.data]);
 
   const handleAnswerChange = (event, index) => {
     const newAnswers = [...answers];
@@ -41,10 +48,10 @@ function CreatePoll() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 mx-auto text-center w-8/12">
-        <span className="text-2xl font-light">Patient Poll</span>
-        <div className="relative mt-4 bg-white shadow-md sm:rounded-lg text-left">
+    <div className="flex flex-col">
+      <div className="py-3 text-center">
+        <span className="text-2xl font-light">Create Questionnaire</span>
+        <div className="mt-4 bg-white shadow-md sm:rounded-lg text-left">
           <div className="h-2 bg-indigo-600 rounded-t-md" />
           <div className="py-6 px-8">
             <form>

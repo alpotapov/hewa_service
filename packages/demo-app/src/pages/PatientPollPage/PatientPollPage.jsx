@@ -1,32 +1,33 @@
 import React from 'react';
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import CreatePoll from './components/CreatePoll';
 import ViewPolls from './components/ViewPolls';
+import ViewPoll from './components/ViewPoll';
+
+import { useSubnavigation } from '../../contexts/SubnavigationContext';
 
 function PatientPollPage() {
+  const { setSubnavigation } = useSubnavigation();
+
+  React.useEffect(() => {
+    setSubnavigation([
+      { path: '/questionnaires/create', label: 'Create' },
+      { path: '/questionnaires/view-all', label: 'View All' },
+      { path: '/questionnaires/view-single', label: 'View Single' },
+    ]);
+
+    return () => {
+      setSubnavigation([]);
+    };
+  }, [setSubnavigation]);
+
   return (
-    <div className="container mx-auto px-4 mt-5">
-      <h1 className="text-2xl font-bold mb-5">Patient Poll</h1>
-      <nav className="mb-5">
-        <ul className="flex space-x-4">
-          <li>
-            <Link className="text-blue-500" to="view">
-              View Polls
-            </Link>
-          </li>
-          <li>
-            <Link className="text-blue-500" to="create">
-              Create Poll
-            </Link>
-          </li>
-        </ul>
-      </nav>
-      <Routes>
-        <Route path="view" element={<ViewPolls />} />
-        <Route path="create" element={<CreatePoll />} />
-        <Route index element={<ViewPolls />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="view-all" element={<ViewPolls />} />
+      <Route path="create" element={<CreatePoll />} />
+      <Route path="view-single" element={<ViewPoll />} />
+      <Route index element={<ViewPolls />} />
+    </Routes>
   );
 }
 

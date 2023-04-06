@@ -58,9 +58,9 @@ function DxReaderIntegrationDemo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+    <div className="py-6 flex flex-col">
       <div className="relative py-3 sm:max-w-xl mx-auto text-center">
-        <span className="text-2xl font-light">HealthDrive App</span>
+        <span className="text-2xl font-light">DxReader Demo</span>
         <div className="relative mt-4 bg-white shadow-md sm:rounded-lg text-left">
           <div className="h-2 bg-indigo-600 rounded-t-md" />
           <div className="py-6 px-8">
