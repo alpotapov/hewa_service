@@ -36,8 +36,8 @@ const extractErrorMessage = (err) => {
   }
 };
 
-const uploadResult = async ({
-  deviceAddress, guid, result, signature,
+const insertIntoRegistry = async ({
+  deviceAddress, uuid, result, signature,
 }) => {
   const { contract } = await getResultRegistryContract();
   const txParameters = {
@@ -48,7 +48,7 @@ const uploadResult = async ({
   // Check that the UUID is not already in the registry
 
   try {
-    const tx = await contract.publishResult(deviceAddress, guid, result, signature, txParameters);
+    const tx = await contract.publishResult(deviceAddress, uuid, result, signature, txParameters);
     return { transactionHash: tx.hash };
   } catch (err) {
     const errorMessage = extractErrorMessage(err);
@@ -64,6 +64,27 @@ const uploadResultToIpfs = async (stringifiedResult) => {
   ];
   const cid = await client.put(files, { wrapWithDirectory: false });
   return cid;
+};
+
+const uploadResult = async ({
+  deviceAddress, uuid, cid, signature, stringifiedResult,
+}) => {
+  const actualCid = await uploadResultToIpfs(stringifiedResult);
+
+  if (actualCid !== cid) {
+    return { errorMessage: 'CIDs not matching' };
+  }
+
+  const { transactionHash, errorMessage } = await insertIntoRegistry(
+    {
+      deviceAddress,
+      uuid,
+      result: actualCid,
+      signature,
+    },
+  );
+
+  return { transactionHash, errorMessage };
 };
 
 const toImportCandidate = (file) => {
@@ -101,7 +122,7 @@ const calculateCid = async (stringifiedResult) => {
 const fetchResultFromIpfs = async (cid) => {
   if (!cid) return {};
   try {
-    const url = `https://${cid}.ipfs.dweb.link`;
+    const url = `https://ipfs.io/ipfs/${cid}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch from IPFS, status code: ${response.status}`);

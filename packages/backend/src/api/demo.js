@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { uuid, testValue } = req.body;
-  const fhirRecord = await demoDomain.getDemoFhirRecord(testValue);
+  const fhirRecord = await demoDomain.getDemoFhirRecord(uuid, testValue);
   const { transactionHash, errorMessage } = await demoDomain.uploadResult(uuid, fhirRecord);
 
   if (errorMessage) {

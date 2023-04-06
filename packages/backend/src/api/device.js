@@ -76,20 +76,13 @@ const uploadResult = async (req, res) => {
   } = req.body;
   console.log('Uploading new result', deviceAddress);
 
-  const actualCid = await resultRegistryDomain.uploadResultToIpfs(stringifiedResult);
-
-  if (actualCid !== cid) {
-    console.error('CIDs not matching', { actualCid, cid });
-    res.status(400).json({ errorMessage: 'Result CID does not match the one in the request' }).send();
-    return;
-  }
-
   const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
     {
       deviceAddress,
       guid,
-      result: actualCid,
+      cid,
       signature,
+      stringifiedResult,
     },
   );
 

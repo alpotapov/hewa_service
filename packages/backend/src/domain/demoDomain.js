@@ -3,19 +3,18 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+const notificationDomain = require('./notification');
+
 const readFile = util.promisify(fs.readFile);
 
 const resultRegistryDomain = require('./resultRegistry');
 
 const { PK_DEMO_APP } = process.env;
 
-const getDemoFhirRecord = (value) => {
+const getDemoFhirRecord = (uuid, value) => {
   const filePath = path.join(__dirname, 'demoFhir.txt');
   return readFile(filePath, 'utf8')
-    .then((data) => {
-      const updatedData = data.replace(/##VALUE##/g, value);
-      return updatedData;
-    })
+    .then((data) => data.replace(/##VALUE##/g, value).replace(/##UUID##/g, uuid))
     .catch((err) => {
       console.error('Error reading the file:', err);
       throw err;
@@ -48,9 +47,19 @@ const uploadResult = async (uuid, fhirRecord) => {
   console.log('Using demo app to upload result', {
     deviceAddress, signature, cid, uuid,
   });
-  const output = await resultRegistryDomain.uploadResult({
-    guid: uuid, result: cid, stringifiedResult: resultAsBuffer.toString(), deviceAddress, signature,
-  });
+  const output = await resultRegistryDomain.uploadResult(
+    {
+      deviceAddress,
+      uuid,
+      cid,
+      signature,
+      stringifiedResult: resultAsBuffer.toString(),
+    },
+  );
+
+  console.log(output);
+
+  await notificationDomain.onTransactionSent(uuid, output.transactionHash);
 
   return output;
 };
