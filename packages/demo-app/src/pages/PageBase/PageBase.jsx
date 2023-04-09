@@ -16,6 +16,9 @@ function PageBase({ children }) {
             <li>
               <Link to="/questionnaires">Questionnaires</Link>
             </li>
+            <li>
+              <Link to="/data-request">Data Requests</Link>
+            </li>
           </ul>
         </div>
       </nav>

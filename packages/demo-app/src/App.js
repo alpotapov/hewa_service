@@ -4,10 +4,10 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Sentry from '@sentry/react';
 import DxReaderIntegrationDemo from './pages/DxReaderIntegrationDemo';
 import PatientPollPage from './pages/PatientPollPage/PatientPollPage';
+import DataRequest from './pages/DataRequest/DataRequest';
 import PageBase from './pages/PageBase/PageBase';
 import { SubnavigationProvider } from './contexts/SubnavigationContext';
 
-console.log(process.env);
 Sentry.init({
   dsn: process.env.REACT_APP_SENTRY_DSN,
   autoSessionTracking: true,
@@ -25,6 +25,7 @@ function App() {
           <SubnavigationProvider>
             <PageBase>
               <Routes>
+                <Route path="/data-request/*" element={<DataRequest />} />
                 <Route path="/questionnaires/*" element={<PatientPollPage />} />
                 <Route path="/dxreader-demo" element={<DxReaderIntegrationDemo />} />
                 <Route path="/" element={<DxReaderIntegrationDemo />} />
