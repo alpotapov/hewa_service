@@ -1,25 +1,19 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { ResponsiveContainer, LineChart, XAxis, YAxis, ReferenceArea, Label } from 'recharts';
 
-function DayPlot({ days }) {
+function DayPlot({ days, ranges, onNewRange, onSelectRange, selectedRangeId }) {
   const daysToPlot = React.useMemo(
     () => Array.from({ length: days }, (_, i) => ({ day: i })),
     [days]
   );
-  const [ranges, setRanges] = useState([]);
-  const [activeRangeIndex, setActiveRangeIndex] = useState(null);
-  const [rangeType, setRangeType] = useState('diagnosis');
+
   const rangeStart = React.useRef(null);
   const [rangeCurrentEnd, setRangeCurrentEnd] = React.useState(null);
   const chartRef = React.useRef(null);
-
-  const deleteRange = (id) => {
-    setRanges(ranges.filter((range) => range.id !== id));
-  };
 
   const getYValue = (chartHeight, chartY) => {
     const domainMin = 0;
@@ -48,9 +42,9 @@ function DayPlot({ days }) {
     }
   };
 
-  const createRange = (start, end, type) => {
+  const createRange = (start, end) => {
     console.log('creating range');
-    setRanges([...ranges, { start, end, type, id: Date.now() }]);
+    onNewRange({ start, end, id: Date.now() });
     rangeStart.current = null;
     setRangeCurrentEnd(null);
   };
@@ -58,11 +52,11 @@ function DayPlot({ days }) {
   const onMouseUp = (e) => {
     console.log('mouse up', e);
     if (!e) {
-      createRange(rangeStart.current, rangeCurrentEnd, rangeType);
+      createRange(rangeStart.current, rangeCurrentEnd);
       return;
     }
     if (!!rangeStart.current && e.activeLabel) {
-      createRange(rangeStart.current, e.activeLabel, rangeType);
+      createRange(rangeStart.current, e.activeLabel);
     }
   };
 
@@ -71,14 +65,6 @@ function DayPlot({ days }) {
     if (e.activeLabel) {
       setRangeCurrentEnd(e.activeLabel);
     }
-  };
-
-  const onSelectChange = (e) => {
-    const newType = e.target.value;
-    setRangeType(newType);
-    setRanges(
-      ranges.map((range) => (range.id === activeRangeIndex ? { ...range, type: newType } : range))
-    );
   };
 
   const getColor = (type) => {
@@ -106,9 +92,10 @@ function DayPlot({ days }) {
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
+            className="my-0"
           >
             <XAxis dataKey="day" />
-            <YAxis domain={[0, ranges.length + 1]} />
+            <YAxis domain={[0, ranges.length + 1]} hide />
             {rangeStart.current && (
               <ReferenceArea
                 key="new-range"
@@ -129,7 +116,9 @@ function DayPlot({ days }) {
                 y2={index + 1}
                 fill={getColor(range.type)}
                 fillOpacity={0.3}
-                onClick={() => setActiveRangeIndex(range.id)}
+                stroke={range.id === selectedRangeId ? 'green' : 'none'}
+                strokeWidth={1}
+                onClick={() => onSelectRange(range.id)}
               >
                 <Label
                   value={`Start: ${range.start}`}
@@ -148,44 +137,20 @@ function DayPlot({ days }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      {activeRangeIndex !== null && (
-        <div className="ml-4">
-          <h3>Range Settings</h3>
-          <div>
-            Type:
-            <select value={rangeType} onChange={onSelectChange}>
-              <option value="diagnosis">Diagnosis</option>
-              <option value="measurement">Measurement</option>
-            </select>
-          </div>
-        </div>
-      )}
-      <div className="ml-4">
-        <h3>Ranges</h3>
-        <div>
-          {ranges.map((range) => (
-            <div
-              key={range.id}
-              className="cursor-pointer"
-              onClick={() => setActiveRangeIndex(range.id)}
-            >
-              <div>
-                {range.start} - {range.end}
-              </div>
-              <div>{range.type}</div>
-              <button type="button" onClick={() => deleteRange(range.id)}>
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
 
 DayPlot.propTypes = {
   days: PropTypes.number.isRequired,
+  ranges: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  onNewRange: PropTypes.func.isRequired,
+  onSelectRange: PropTypes.func.isRequired,
+  selectedRangeId: PropTypes.number,
+};
+
+DayPlot.defaultProps = {
+  selectedRangeId: null,
 };
 
 export default DayPlot;

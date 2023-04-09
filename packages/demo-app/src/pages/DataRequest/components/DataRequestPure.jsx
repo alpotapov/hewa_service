@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import FilterableList from './components/FilterableList';
-import DayPlot from './components/DayChart';
+import FilterableList from './FilterableList';
 
 function DataRequestPure({ diagnoses, data, onSendRequest }) {
   const [startDate, setStartDate] = React.useState('');
@@ -53,7 +52,6 @@ function DataRequestPure({ diagnoses, data, onSendRequest }) {
 
   return (
     <div className="w-full max-w-xl mx-auto p-4">
-      <DayPlot days={100} />
       <div className="flex flex-wrap mb-4">
         <div className="w-full md:w-1/2 px-2 mb-2">
           Start Date:
