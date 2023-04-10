@@ -23,10 +23,9 @@ function EventFrequency({ selectedRange, onChange }) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-md shadow-md">
-      <h2 className="text-lg font-semibold mb-4">Frequency</h2>
+    <>
       <form>
-        <div className="space-y-4">
+        <div className="flex flex-row space-x-4">
           {Object.entries(predefinedOptions).map(([key, minutes]) => (
             <div key={key}>
               <input
@@ -43,33 +42,36 @@ function EventFrequency({ selectedRange, onChange }) {
               </label>
             </div>
           ))}
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="frequency-custom"
-              name="frequency"
-              value="custom"
-              checked={frequency === 'custom'}
-              onChange={handleFrequencyChange}
-              className="mr-2"
-            />
-            <div className="text-sm mr-2">Custom</div>
-            <input
-              type="number"
-              min="1"
-              value={selectedRange.maxMinutes}
-              onChange={handleCustomChange}
-              disabled={frequency !== 'custom'}
-              className="text-sm w-24 p-1 border rounded-md"
-            />
-            <span className="text-sm ml-1">minutes</span>
-          </div>
+        </div>
+        <div className="mt-2 flex items-center">
+          <input
+            type="radio"
+            id="frequency-custom"
+            name="frequency"
+            value="custom"
+            checked={frequency === 'custom'}
+            onChange={handleFrequencyChange}
+            className="mr-2"
+          />
+          <div className="text-sm mr-2">Custom</div>
+          <input
+            type="number"
+            min="1"
+            value={selectedRange.maxMinutes}
+            onChange={handleCustomChange}
+            disabled={frequency !== 'custom'}
+            className="text-sm w-24 p-1 border rounded-md"
+          />
+          <span className="text-sm ml-1">minutes</span>
         </div>
       </form>
       <div className="mt-4">
-        <p className="text-sm">Max minutes between measurements: {selectedRange.maxMinutes}</p>
+        <p className="text-sm">
+          Maximum period between measurements:{' '}
+          {selectedRange.maxMinutes && `${selectedRange.maxMinutes} minutes`}
+        </p>
       </div>
-    </div>
+    </>
   );
 }
 

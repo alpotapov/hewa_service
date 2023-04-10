@@ -76,7 +76,10 @@ function RangeEditor({
       </div>
 
       {selectedRange.type === 'measurement' && (
-        <EventFrequency selectedRange={selectedRange} onChange={handleMaxMinutesChange} />
+        <div className="my-4 bg-white p-4 rounded-md shadow-md">
+          <div className="block mb-2 text-sm font-medium text-gray-700">Measurement frequency</div>
+          <EventFrequency selectedRange={selectedRange} onChange={handleMaxMinutesChange} />
+        </div>
       )}
 
       {selectedRange.type === 'measurement' && (
