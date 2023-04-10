@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import FilterableList from './FilterableList';
+import EventFrequency from './EventFrequency';
 
 function RangeEditor({
   ranges,
@@ -27,8 +28,8 @@ function RangeEditor({
     onUpdate(updatedRange);
   };
 
-  const handleMaxMinutesChange = (e) => {
-    const updatedRange = { ...selectedRange, maxMinutes: Number(e.target.value) };
+  const handleMaxMinutesChange = (minutes) => {
+    const updatedRange = { ...selectedRange, maxMinutes: Number(minutes) };
     onUpdate(updatedRange);
   };
 
@@ -75,21 +76,11 @@ function RangeEditor({
       </div>
 
       {selectedRange.type === 'measurement' && (
-        <div className="mb-4">
-          <div className="block text-sm font-medium text-gray-700">
-            Max Minutes Between Measurements
-          </div>
-          <input
-            type="number"
-            value=""
-            onChange={handleMaxMinutesChange}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-        </div>
+        <EventFrequency selectedRange={selectedRange} onChange={handleMaxMinutesChange} />
       )}
 
       {selectedRange.type === 'measurement' && (
-        <div className="mb-4">
+        <div className="my-4 bg-white p-4 rounded-md shadow-md">
           <div className="block mb-1 text-sm font-medium text-gray-700">Type of measurement</div>
           <FilterableList
             items={measurements}
@@ -100,7 +91,7 @@ function RangeEditor({
         </div>
       )}
       {selectedRange.type === 'diagnosis' && (
-        <div className="mb-4">
+        <div className="my-4 bg-white p-4 rounded-md shadow-md">
           <div className="block mb-1 text-sm font-medium text-gray-700">Type of diagnosis</div>
           <FilterableList
             items={diagnoses}
