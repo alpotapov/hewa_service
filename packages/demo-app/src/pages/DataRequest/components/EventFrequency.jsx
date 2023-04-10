@@ -9,18 +9,15 @@ const predefinedOptions = {
 };
 
 function EventFrequency({ selectedRange, onChange }) {
-  console.log({ selectedRange });
   const [frequency, setFrequency] = useState();
 
   const handleFrequencyChange = (e) => {
-    console.log(e.target.value);
     setFrequency(e.target.value);
     if (e.target.value === 'custom') return;
     onChange(predefinedOptions[e.target.value]);
   };
 
   const handleCustomChange = (e) => {
-    // setCustomMinutes(e.target.value);
     setFrequency('custom');
     onChange(e.target.value);
   };
