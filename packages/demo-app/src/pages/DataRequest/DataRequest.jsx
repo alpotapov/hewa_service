@@ -1,12 +1,16 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import DataRequestPure from './components/DataRequestPure';
 import DayPlot from './components/DayChart';
+import RangeEditor from './components/RangeEditor';
+import RangeList from './components/RangeList';
 
 function DataRequest() {
   const diagnoses = [
-    'Covid',
+    'Covid Positive',
+    'Covid Negative',
     'Diabetes',
     'Hypertension',
     'Asthma',
@@ -33,6 +37,10 @@ function DataRequest() {
     'Sleep Disorder',
   ];
   const data = [
+    'Ferritin',
+    'Cortisol',
+    'Hemoglobin A1c',
+    'Vitamin D',
     'Blood Pressure',
     'Blood Sugar',
     'Weight',
@@ -46,17 +54,35 @@ function DataRequest() {
   };
   const [ranges, setRanges] = React.useState([]);
   const [selectedRangeId, setSelectedRangeId] = React.useState(null);
+  const [selectedRange, setSelectedRange] = React.useState(null);
+  const getRange = (id) => ranges.find((range) => range.id === id);
   const onNewRange = ({ start, end }) => {
-    setRanges([...ranges, { start, end, type: 'measurement', id: Date.now() }]);
+    setRanges([
+      ...ranges,
+      { start, end, type: 'measurement', id: Date.now(), metadata: { measurement: [] } },
+    ]);
   };
   const onDeleteRange = (id) => {
     setRanges(ranges.filter((range) => range.id !== id));
+    if (id === selectedRangeId) {
+      setSelectedRangeId(null);
+      setSelectedRange(null);
+    }
+  };
+  const onUpdate = (updatedRange) => {
+    setRanges(ranges.map((range) => (range.id === updatedRange.id ? updatedRange : range)));
+    console.log(ranges.map((range) => (range.id === updatedRange.id ? updatedRange : range)));
   };
   const onSelectRange = (id) => {
     setSelectedRangeId(id);
+    setSelectedRange(getRange(id));
   };
   const onRangeTypeChange = (newType, id) => {
-    setRanges(ranges.map((range) => (range.id === id ? { ...range, type: newType } : range)));
+    setRanges(
+      ranges.map((range) =>
+        range.id === id ? { ...range, type: newType, metadata: { [newType]: [] } } : range
+      )
+    );
   };
 
   return (
@@ -69,7 +95,21 @@ function DataRequest() {
         selectedRangeId={selectedRangeId}
         setSelectedRangeId={setSelectedRangeId}
       />
-      <div className="ml-4">
+      <div className="flex flex-col md:flex-row space-y-4 md:space-x-4 md:space-y-0">
+        <RangeList ranges={ranges} onSelectRange={onSelectRange} />
+        {selectedRangeId && (
+          <RangeEditor
+            ranges={ranges}
+            selectedRangeId={selectedRangeId}
+            onDelete={onDeleteRange}
+            onUpdate={onUpdate}
+            onRangeTypeChange={onRangeTypeChange}
+            diagnoses={diagnoses}
+            measurements={data}
+          />
+        )}
+      </div>
+      {/* <div className="ml-4">
         <h3>Ranges</h3>
         <div>
           {ranges.map((range) => (
@@ -94,8 +134,8 @@ function DataRequest() {
             </div>
           ))}
         </div>
-      </div>
-      <DataRequestPure diagnoses={diagnoses} data={data} onSendRequest={onSendRequest} />
+      </div> */}
+      {/* <DataRequestPure diagnoses={diagnoses} data={data} onSendRequest={onSendRequest} /> */}
     </div>
   );
 }

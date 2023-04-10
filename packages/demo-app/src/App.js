@@ -9,7 +9,7 @@ import PageBase from './pages/PageBase/PageBase';
 import { SubnavigationProvider } from './contexts/SubnavigationContext';
 
 Sentry.init({
-  dsn: process.env.REACT_APP_SENTRY_DSN,
+  dsn: process.env.NODE_ENV === 'development' ? null : process.env.REACT_APP_SENTRY_DSN,
   autoSessionTracking: true,
   debug: process.env.NODE_ENV === 'development',
   release: `webapp@${process.env.npm_package_version}`,

@@ -19,7 +19,6 @@ function DayPlot({ days, ranges, onNewRange, onSelectRange, selectedRangeId }) {
     const domainMin = 0;
     const domainMax = ranges.length + 1;
     const inverseChartY = chartHeight - chartY;
-    console.log({ chartHeight, chartY, domainMin, domainMax, inverseChartY });
     return ((domainMax - domainMin) * inverseChartY) / chartHeight;
   };
 
@@ -29,13 +28,11 @@ function DayPlot({ days, ranges, onNewRange, onSelectRange, selectedRangeId }) {
     );
 
   const onMouseDown = (e) => {
-    console.log('mouse down', e);
     if (!e) return;
     if (e.activeLabel) {
       const xValue = e.activeLabel;
       const chartHeight = chartRef.current?.container.clientHeight;
       const yValue = getYValue(chartHeight, e.chartY);
-      console.log({ xValue, yValue });
       if (!isInsideRange(xValue, yValue)) {
         rangeStart.current = e.activeLabel;
       }
@@ -43,14 +40,12 @@ function DayPlot({ days, ranges, onNewRange, onSelectRange, selectedRangeId }) {
   };
 
   const createRange = (start, end) => {
-    console.log('creating range');
     onNewRange({ start, end, id: Date.now() });
     rangeStart.current = null;
     setRangeCurrentEnd(null);
   };
 
   const onMouseUp = (e) => {
-    console.log('mouse up', e);
     if (!e) {
       createRange(rangeStart.current, rangeCurrentEnd);
       return;
@@ -77,10 +72,6 @@ function DayPlot({ days, ranges, onNewRange, onSelectRange, selectedRangeId }) {
         return 'rgba(0, 0, 0, 0.3)';
     }
   };
-
-  React.useEffect(() => {
-    console.log(ranges);
-  }, [ranges]);
 
   return (
     <div className="flex">

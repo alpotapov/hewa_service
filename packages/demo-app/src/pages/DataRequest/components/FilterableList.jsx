@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-function FilterableList({ items, onSelectionChange, searchPlaceholder }) {
+function FilterableList({ items, selectedItems, setSelectedItems, searchPlaceholder }) {
   const [search, setSearch] = useState('');
   const [filteredItems, setFilteredItems] = useState(items);
-  const [selectedItems, setSelectedItems] = useState([]);
 
   const onSearchChange = (e) => {
     const searchValue = e.target.value;
@@ -25,10 +24,6 @@ function FilterableList({ items, onSelectionChange, searchPlaceholder }) {
     setSearch('');
     setFilteredItems(items);
   };
-
-  React.useEffect(() => {
-    onSelectionChange(selectedItems);
-  }, [selectedItems, onSelectionChange]);
 
   return (
     <div>
@@ -51,7 +46,12 @@ function FilterableList({ items, onSelectionChange, searchPlaceholder }) {
       <div className="h-60 overflow-y-scroll border rounded" style={{ maxHeight: '20rem' }}>
         {filteredItems.map((item) => (
           <div key={item} className="flex items-center mb-1">
-            <input type="checkbox" id={item} onChange={(e) => onCheckboxChange(e, item)} />
+            <input
+              checked={selectedItems.includes(item)}
+              type="checkbox"
+              id={item}
+              onChange={(e) => onCheckboxChange(e, item)}
+            />
             <label htmlFor={item} className="ml-2">
               {item}
             </label>
@@ -64,7 +64,8 @@ function FilterableList({ items, onSelectionChange, searchPlaceholder }) {
 
 FilterableList.propTypes = {
   items: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onSelectionChange: PropTypes.func.isRequired,
+  selectedItems: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
   searchPlaceholder: PropTypes.string,
 };
 
