@@ -79,7 +79,7 @@ const uploadResult = async (req, res) => {
   const { transactionHash, errorMessage } = await resultRegistryDomain.uploadResult(
     {
       deviceAddress,
-      guid,
+      uuid: guid,
       cid,
       signature,
       stringifiedResult,
